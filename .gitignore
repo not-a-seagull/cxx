@@ -1,4 +1,10 @@
-/Cargo.lock
+/.buckd
+/bazel-bin
+/bazel-cxx
+/bazel-out
+/bazel-testlogs
+/buck-out
 /expand.cc
 /expand.rs
-/target
+Cargo.lock
+target

@@ -1,3 +1,11 @@
+//! [![github]](https://github.com/dtolnay/cxx)&ensp;[![crates-io]](https://crates.io/crates/cxx)&ensp;[![docs-rs]](https://docs.rs/cxx)
+//!
+//! [github]: https://img.shields.io/badge/github-8da0cb?style=for-the-badge&labelColor=555555&logo=github
+//! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&labelColor=555555&logo=rust
+//! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&labelColor=555555&logoColor=white&logo=data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDUxMiA1MTIiPjxwYXRoIGZpbGw9IiNmNWY1ZjUiIGQ9Ik00ODguNiAyNTAuMkwzOTIgMjE0VjEwNS41YzAtMTUtOS4zLTI4LjQtMjMuNC0zMy43bC0xMDAtMzcuNWMtOC4xLTMuMS0xNy4xLTMuMS0yNS4zIDBsLTEwMCAzNy41Yy0xNC4xIDUuMy0yMy40IDE4LjctMjMuNCAzMy43VjIxNGwtOTYuNiAzNi4yQzkuMyAyNTUuNSAwIDI2OC45IDAgMjgzLjlWMzk0YzAgMTMuNiA3LjcgMjYuMSAxOS45IDMyLjJsMTAwIDUwYzEwLjEgNS4xIDIyLjEgNS4xIDMyLjIgMGwxMDMuOS01MiAxMDMuOSA1MmMxMC4xIDUuMSAyMi4xIDUuMSAzMi4yIDBsMTAwLTUwYzEyLjItNi4xIDE5LjktMTguNiAxOS45LTMyLjJWMjgzLjljMC0xNS05LjMtMjguNC0yMy40LTMzLjd6TTM1OCAyMTQuOGwtODUgMzEuOXYtNjguMmw4NS0zN3Y3My4zek0xNTQgMTA0LjFsMTAyLTM4LjIgMTAyIDM4LjJ2LjZsLTEwMiA0MS40LTEwMi00MS40di0uNnptODQgMjkxLjFsLTg1IDQyLjV2LTc5LjFsODUtMzguOHY3NS40em0wLTExMmwtMTAyIDQxLjQtMTAyLTQxLjR2LS42bDEwMi0zOC4yIDEwMiAzOC4ydi42em0yNDAgMTEybC04NSA0Mi41di03OS4xbDg1LTM4Ljh2NzUuNHptMC0xMTJsLTEwMiA0MS40LTEwMi00MS40di0uNmwxMDItMzguMiAxMDIgMzguMnYuNnoiPjwvcGF0aD48L3N2Zz4K
+//!
+//! <br>
+//!
 //! This library provides a **safe** mechanism for calling C++ code from Rust
 //! and Rust code from C++, not subject to the many ways that things can go
 //! wrong when using bindgen or cbindgen to generate unsafe C-style bindings.
@@ -10,8 +18,8 @@
 //!
 //! <br>
 //!
-//! *Compiler support: requires rustc 1.42+ (beta on January 30, stable on March
-//! 12)*
+//! *Compiler support: requires rustc 1.42+ and c++11 or newer*<br>
+//! *[Release notes](https://github.com/dtolnay/cxx/releases)*
 //!
 //! <br>
 //!
@@ -49,10 +57,9 @@
 //!
 //! # Example
 //!
-//! A runnable version of this example is provided under the *demo-rs* directory
-//! of https://github.com/dtolnay/cxx (with the C++ side of the implementation
-//! in the *demo-cxx* directory). To try it out, jump into demo-rs and run
-//! `cargo run`.
+//! A runnable version of this example is provided under the *demo* directory of
+//! [https://github.com/dtolnay/cxx]. To try it out, run `cargo run` from that
+//! directory.
 //!
 //! ```no_run
 //! #[cxx::bridge]
@@ -68,7 +75,7 @@
 //!         // One or more headers with the matching C++ declarations. Our code
 //!         // generators don't read it but it gets #include'd and used in static
 //!         // assertions to ensure our picture of the FFI boundary is accurate.
-//!         include!("demo-cxx/demo.h");
+//!         include!("demo/include/demo.h");
 //!
 //!         // Zero or more opaque types which both languages can pass around but
 //!         // only C++ can see the fields.
@@ -105,10 +112,10 @@
 //!
 //! Here are links to the complete set of source files involved in the demo:
 //!
-//! - [demo-rs/src/main.rs](https://github.com/dtolnay/cxx/blob/master/demo-rs/src/main.rs)
-//! - [demo-rs/build.rs](https://github.com/dtolnay/cxx/blob/master/demo-rs/build.rs)
-//! - [demo-cxx/demo.h](https://github.com/dtolnay/cxx/blob/master/demo-cxx/demo.h)
-//! - [demo-cxx/demo.cc](https://github.com/dtolnay/cxx/blob/master/demo-cxx/demo.cc)
+//! - [demo/src/main.rs](https://github.com/dtolnay/cxx/blob/master/demo/src/main.rs)
+//! - [demo/build.rs](https://github.com/dtolnay/cxx/blob/master/demo/build.rs)
+//! - [demo/include/demo.h](https://github.com/dtolnay/cxx/blob/master/demo/include/demo.h)
+//! - [demo/src/demo.cc](https://github.com/dtolnay/cxx/blob/master/demo/src/demo.cc)
 //!
 //! To look at the code generated in both languages for the example by the CXX
 //! code generators:
@@ -116,10 +123,10 @@
 //! ```console
 //!    # run Rust code generator and print to stdout
 //!    # (requires https://github.com/dtolnay/cargo-expand)
-//! $ cargo expand --manifest-path demo-rs/Cargo.toml
+//! $ cargo expand --manifest-path demo/Cargo.toml
 //!
 //!    # run C++ code generator and print to stdout
-//! $ cargo run --manifest-path cmd/Cargo.toml -- demo-rs/src/main.rs
+//! $ cargo run --manifest-path gen/cmd/Cargo.toml -- demo/src/main.rs
 //! ```
 //!
 //! <br>
@@ -217,19 +224,25 @@
 //!
 //! [`cc::Build`]: https://docs.rs/cc/1.0/cc/struct.Build.html
 //!
+//! ```toml
+//! # Cargo.toml
+//!
+//! [build-dependencies]
+//! cxx-build = "0.4"
+//! ```
+//!
 //! ```no_run
 //! // build.rs
 //!
 //! fn main() {
-//!     cxx::Build::new()
-//!         .bridge("src/main.rs")  // returns a cc::Build
-//!         .file("../demo-cxx/demo.cc")
-//!         .flag("-std=c++11")
+//!     cxx_build::bridge("src/main.rs")  // returns a cc::Build
+//!         .file("src/demo.cc")
+//!         .flag_if_supported("-std=c++11")
 //!         .compile("cxxbridge-demo");
 //!
 //!     println!("cargo:rerun-if-changed=src/main.rs");
-//!     println!("cargo:rerun-if-changed=../demo-cxx/demo.h");
-//!     println!("cargo:rerun-if-changed=../demo-cxx/demo.cc");
+//!     println!("cargo:rerun-if-changed=src/demo.cc");
+//!     println!("cargo:rerun-if-changed=include/demo.h");
 //! }
 //! ```
 //!
@@ -240,7 +253,7 @@
 //! For use in non-Cargo builds like Bazel or Buck, CXX provides an alternate
 //! way of invoking the C++ code generator as a standalone command line tool.
 //! The tool is packaged as the `cxxbridge-cmd` crate on crates.io or can be
-//! built from the *cmd* directory of https://github.com/dtolnay/cxx.
+//! built from the *cmd* directory of [https://github.com/dtolnay/cxx].
 //!
 //! ```bash
 //! $ cargo install cxxbridge-cmd
@@ -296,23 +309,27 @@
 //!
 //! # Builtin types
 //!
-//! In addition to all the primitive types (i32 ⟷ int32_t), the following common
-//! types may be used in the fields of shared structs and the arguments and
-//! returns of functions.
+//! In addition to all the primitive types (i32 &lt;=&gt; int32_t), the
+//! following common types may be used in the fields of shared structs and the
+//! arguments and returns of functions.
 //!
 //! <table>
 //! <tr><th>name in Rust</th><th>name in C++</th><th>restrictions</th></tr>
-//! <tr><td>String</td><td>cxxbridge::RustString</td><td></td></tr>
-//! <tr><td>&amp;str</td><td>cxxbridge::RustStr</td><td></td></tr>
-//! <tr><td><a href="https://docs.rs/cxx/0.1/cxx/struct.CxxString.html">CxxString</a></td><td>std::string</td><td><sup><i>cannot be passed by value</i></sup></td></tr>
-//! <tr><td>Box&lt;T&gt;</td><td>cxxbridge::RustBox&lt;T&gt;</td><td><sup><i>cannot hold opaque C++ type</i></sup></td></tr>
-//! <tr><td><a href="https://docs.rs/cxx/0.1/cxx/struct.UniquePtr.html">UniquePtr&lt;T&gt;</a></td><td>std::unique_ptr&lt;T&gt;</td><td><sup><i>cannot hold opaque Rust type</i></sup></td></tr>
-//! <tr><td></td><td></td><td></td></tr>
+//! <tr><td>String</td><td>rust::String</td><td></td></tr>
+//! <tr><td>&amp;str</td><td>rust::Str</td><td></td></tr>
+//! <tr><td>&amp;[u8]</td><td>rust::Slice&lt;uint8_t&gt;</td><td><sup><i>arbitrary &amp;[T] not implemented yet</i></sup></td></tr>
+//! <tr><td><a href="struct.CxxString.html">CxxString</a></td><td>std::string</td><td><sup><i>cannot be passed by value</i></sup></td></tr>
+//! <tr><td>Box&lt;T&gt;</td><td>rust::Box&lt;T&gt;</td><td><sup><i>cannot hold opaque C++ type</i></sup></td></tr>
+//! <tr><td><a href="struct.UniquePtr.html">UniquePtr&lt;T&gt;</a></td><td>std::unique_ptr&lt;T&gt;</td><td><sup><i>cannot hold opaque Rust type</i></sup></td></tr>
+//! <tr><td>Vec&lt;T&gt;</td><td>rust::Vec&lt;T&gt;</td><td><sup><i>cannot hold opaque C++ type</i></sup></td></tr>
+//! <tr><td><a href="struct.CxxVector.html">CxxVector&lt;T&gt;</a></td><td>std::vector&lt;T&gt;</td><td><sup><i>cannot be passed by value, cannot hold opaque Rust type</i></sup></td></tr>
+//! <tr><td>fn(T, U) -&gt; V</td><td>rust::Fn&lt;V(T, U)&gt;</td><td><sup><i>only passing from Rust to C++ is implemented so far</i></sup></td></tr>
+//! <tr><td>Result&lt;T&gt;</td><td>throw/catch</td><td><sup><i>allowed as return type only</i></sup></td></tr>
 //! </table>
 //!
-//! The C++ API of the `cxxbridge` namespace is defined by the
-//! *include/cxxbridge.h* file in https://github.com/dtolnay/cxx. You will need
-//! to include this header in your C++ code when working with those types.
+//! The C++ API of the `rust` namespace is defined by the *include/cxx.h* file
+//! in [https://github.com/dtolnay/cxx]. You will need to include this header in
+//! your C++ code when working with those types.
 //!
 //! The following types are intended to be supported "soon" but are just not
 //! implemented yet. I don't expect any of these to be hard to make work but
@@ -320,145 +337,115 @@
 //!
 //! <table>
 //! <tr><th>name in Rust</th><th>name in C++</th></tr>
-//! <tr><td>&amp;[T]</td><td><sup><i>tbd</i></sup></td></tr>
-//! <tr><td>Vec&lt;T&gt;</td><td><sup><i>tbd</i></sup></td></tr>
 //! <tr><td>BTreeMap&lt;K, V&gt;</td><td><sup><i>tbd</i></sup></td></tr>
 //! <tr><td>HashMap&lt;K, V&gt;</td><td><sup><i>tbd</i></sup></td></tr>
-//! <tr><td><sup><i>tbd</i></sup></td><td>std::vector&lt;T&gt;</td></tr>
+//! <tr><td>Arc&lt;T&gt;</td><td><sup><i>tbd</i></sup></td></tr>
+//! <tr><td>Option&lt;T&gt;</td><td><sup><i>tbd</i></sup></td></tr>
 //! <tr><td><sup><i>tbd</i></sup></td><td>std::map&lt;K, V&gt;</td></tr>
 //! <tr><td><sup><i>tbd</i></sup></td><td>std::unordered_map&lt;K, V&gt;</td></tr>
+//! <tr><td><sup><i>tbd</i></sup></td><td>std::shared_ptr&lt;T&gt;</td></tr>
 //! </table>
+//!
+//! [https://github.com/dtolnay/cxx]: https://github.com/dtolnay/cxx
 
+#![no_std]
+#![doc(html_root_url = "https://docs.rs/cxx/0.4.4")]
 #![deny(improper_ctypes)]
+#![allow(non_camel_case_types)]
 #![allow(
+    clippy::cognitive_complexity,
+    clippy::declare_interior_mutable_const,
+    clippy::inherent_to_string,
     clippy::large_enum_variant,
+    clippy::len_without_is_empty,
     clippy::missing_safety_doc,
     clippy::module_inception,
+    clippy::needless_doctest_main,
     clippy::new_without_default,
     clippy::or_fun_call,
     clippy::ptr_arg,
     clippy::toplevel_ref_arg,
-    clippy::transmute_ptr_to_ptr,
     clippy::useless_let_if_seq
 )]
 
+#[cfg(built_with_cargo)]
+extern crate link_cplusplus;
+
+extern crate alloc;
+extern crate std;
+
+#[macro_use]
+mod macros;
+
 mod cxx_string;
-mod error;
-mod gen;
+mod cxx_vector;
+mod exception;
+mod extern_type;
+mod function;
 mod opaque;
-mod paths;
+mod result;
+mod rust_sliceu8;
 mod rust_str;
 mod rust_string;
-mod syntax;
+mod rust_vec;
+mod symbols;
 mod unique_ptr;
 mod unwind;
 
 pub use crate::cxx_string::CxxString;
+pub use crate::cxx_vector::CxxVector;
+pub use crate::exception::Exception;
+pub use crate::extern_type::ExternType;
 pub use crate::unique_ptr::UniquePtr;
 pub use cxxbridge_macro::bridge;
+
+/// For use in impls of the `ExternType` trait. See [`ExternType`].
+///
+/// [`ExternType`]: trait.ExternType.html
+pub use cxxbridge_macro::type_id;
+
+/// Synonym for `CxxString`.
+///
+/// To avoid confusion with Rust's standard library string you probably
+/// shouldn't import this type with `use`. Instead, write `cxx::String`, or
+/// import and use `CxxString`.
+pub type String = CxxString;
+
+/// Synonym for `CxxVector`.
+///
+/// To avoid confusion with Rust's standard library vector you probably
+/// shouldn't import this type with `use`. Instead, write `cxx::Vector<T>`, or
+/// import and use `CxxVector`.
+pub type Vector<T> = CxxVector<T>;
 
 // Not public API.
 #[doc(hidden)]
 pub mod private {
+    pub use crate::cxx_vector::VectorElement;
+    pub use crate::extern_type::verify_extern_type;
+    pub use crate::function::FatFunction;
     pub use crate::opaque::Opaque;
+    pub use crate::result::{r#try, Result};
+    pub use crate::rust_sliceu8::RustSliceU8;
     pub use crate::rust_str::RustStr;
     pub use crate::rust_string::RustString;
+    pub use crate::rust_vec::RustVec;
     pub use crate::unique_ptr::UniquePtrTarget;
     pub use crate::unwind::catch_unwind;
 }
 
-use crate::error::Result;
-use std::fs;
-use std::io::{self, Write};
-use std::path::Path;
-use std::process;
-
-/// The CXX code generator for constructing and compiling C++ code.
-///
-/// This is intended to be used from Cargo build scripts to execute CXX's
-/// C++ code generator, set up any additional compiler flags depending on
-/// the use case, and make the C++ compiler invocation.
-///
-/// <br>
-///
-/// # Example
-///
-/// Example of a canonical Cargo build script that builds a CXX bridge:
-///
-/// ```no_run
-/// // build.rs
-///
-/// fn main() {
-///     cxx::Build::new()
-///         .bridge("src/main.rs")
-///         .file("../demo-cxx/demo.cc")
-///         .flag("-std=c++11")
-///         .compile("cxxbridge-demo");
-///
-///     println!("cargo:rerun-if-changed=src/main.rs");
-///     println!("cargo:rerun-if-changed=../demo-cxx/demo.h");
-///     println!("cargo:rerun-if-changed=../demo-cxx/demo.cc");
-/// }
-/// ```
-///
-/// A runnable working setup with this build script is shown in the
-/// *demo-rs* and *demo-cxx* directories of
-/// [https://github.com/dtolnay/cxx](https://github.com/dtolnay/cxx).
-///
-/// <br>
-///
-/// # Alternatives
-///
-/// For use in non-Cargo builds like Bazel or Buck, CXX provides an
-/// alternate way of invoking the C++ code generator as a standalone command
-/// line tool. The tool is packaged as the `cxxbridge-cmd` crate.
-///
-/// ```bash
-/// $ cargo install cxxbridge-cmd  # or build it from the repo
-///
-/// $ cxxbridge src/main.rs --header > path/to/mybridge.h
-/// $ cxxbridge src/main.rs > path/to/mybridge.cc
-/// ```
-#[must_use]
-pub struct Build {
-    _private: (),
+macro_rules! chars {
+    ($($ch:ident)*) => {
+        $(
+            #[doc(hidden)]
+            pub enum $ch {}
+        )*
+    };
 }
 
-impl Build {
-    /// Begin with a [`cc::Build`] in its default configuration.
-    pub fn new() -> Self {
-        Build { _private: () }
-    }
-
-    /// This returns a [`cc::Build`] on which you should continue to set up
-    /// any additional source files or compiler flags, and lastly call its
-    /// [`compile`] method to execute the C++ build.
-    ///
-    /// [`compile`]: https://docs.rs/cc/1.0.49/cc/struct.Build.html#method.compile
-    #[must_use]
-    pub fn bridge(&self, rust_source_file: impl AsRef<Path>) -> cc::Build {
-        match try_generate_bridge(rust_source_file.as_ref()) {
-            Ok(build) => build,
-            Err(err) => {
-                let _ = writeln!(io::stderr(), "\n\ncxxbridge error: {}\n\n", err);
-                process::exit(1);
-            }
-        }
-    }
-}
-
-fn try_generate_bridge(rust_source_file: &Path) -> Result<cc::Build> {
-    let header = gen::do_generate_header(rust_source_file);
-    let header_path = paths::out_with_extension(rust_source_file, ".h")?;
-    fs::create_dir_all(header_path.parent().unwrap())?;
-    fs::write(&header_path, header)?;
-    paths::symlink_header(&header_path, rust_source_file);
-
-    let bridge = gen::do_generate_bridge(rust_source_file);
-    let bridge_path = paths::out_with_extension(rust_source_file, ".cc")?;
-    fs::write(&bridge_path, bridge)?;
-    let mut build = paths::cc_build();
-    build.file(&bridge_path);
-
-    Ok(build)
+chars! {
+    _0 _1 _2 _3 _4 _5 _6 _7 _8 _9
+    A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+    a b c d e f g h i j k l m n o p q r s t u v w x y z
+    __ // underscore
 }

@@ -1,9 +1,10 @@
 CXX &mdash; safe FFI between Rust and C++
 =========================================
 
-[![Build Status](https://api.travis-ci.com/dtolnay/cxx.svg?branch=master)](https://travis-ci.com/dtolnay/cxx)
-[![Latest Version](https://img.shields.io/crates/v/cxx.svg)](https://crates.io/crates/cxx)
-[![Rust Documentation](https://img.shields.io/badge/api-rustdoc-blue.svg)](https://docs.rs/cxx)
+[<img alt="github" src="https://img.shields.io/badge/github-dtolnay/cxx-8da0cb?style=for-the-badge&labelColor=555555&logo=github" height="20">](https://github.com/dtolnay/cxx)
+[<img alt="crates.io" src="https://img.shields.io/crates/v/cxx.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/cxx)
+[<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-cxx-66c2a5?style=for-the-badge&labelColor=555555&logoColor=white&logo=data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDUxMiA1MTIiPjxwYXRoIGZpbGw9IiNmNWY1ZjUiIGQ9Ik00ODguNiAyNTAuMkwzOTIgMjE0VjEwNS41YzAtMTUtOS4zLTI4LjQtMjMuNC0zMy43bC0xMDAtMzcuNWMtOC4xLTMuMS0xNy4xLTMuMS0yNS4zIDBsLTEwMCAzNy41Yy0xNC4xIDUuMy0yMy40IDE4LjctMjMuNCAzMy43VjIxNGwtOTYuNiAzNi4yQzkuMyAyNTUuNSAwIDI2OC45IDAgMjgzLjlWMzk0YzAgMTMuNiA3LjcgMjYuMSAxOS45IDMyLjJsMTAwIDUwYzEwLjEgNS4xIDIyLjEgNS4xIDMyLjIgMGwxMDMuOS01MiAxMDMuOSA1MmMxMC4xIDUuMSAyMi4xIDUuMSAzMi4yIDBsMTAwLTUwYzEyLjItNi4xIDE5LjktMTguNiAxOS45LTMyLjJWMjgzLjljMC0xNS05LjMtMjguNC0yMy40LTMzLjd6TTM1OCAyMTQuOGwtODUgMzEuOXYtNjguMmw4NS0zN3Y3My4zek0xNTQgMTA0LjFsMTAyLTM4LjIgMTAyIDM4LjJ2LjZsLTEwMiA0MS40LTEwMi00MS40di0uNnptODQgMjkxLjFsLTg1IDQyLjV2LTc5LjFsODUtMzguOHY3NS40em0wLTExMmwtMTAyIDQxLjQtMTAyLTQxLjR2LS42bDEwMi0zOC4yIDEwMiAzOC4ydi42em0yNDAgMTEybC04NSA0Mi41di03OS4xbDg1LTM4Ljh2NzUuNHptMC0xMTJsLTEwMiA0MS40LTEwMi00MS40di0uNmwxMDItMzguMiAxMDIgMzguMnYuNnoiPjwvcGF0aD48L3N2Zz4K" height="20">](https://docs.rs/cxx)
+[<img alt="build status" src="https://img.shields.io/github/workflow/status/dtolnay/cxx/CI/master?style=for-the-badge" height="20">](https://github.com/dtolnay/cxx/actions?query=branch%3Amaster)
 
 This library provides a **safe** mechanism for calling C++ code from Rust and
 Rust code from C++, not subject to the many ways that things can go wrong when
@@ -17,11 +18,14 @@ can be 100% safe.
 
 ```toml
 [dependencies]
-cxx = "0.1"
+cxx = "0.4"
+
+[build-dependencies]
+cxx-build = "0.4"
 ```
 
-*Compiler support: requires rustc 1.42+ (beta on January 30, stable on March
-12)*
+*Compiler support: requires rustc 1.42+ and c++11 or newer*<br>
+*[Release notes](https://github.com/dtolnay/cxx/releases)*
 
 <br>
 
@@ -52,16 +56,15 @@ CXX guarantees an ABI-compatible signature that both sides understand, based on
 builtin bindings for key standard library types to expose an idiomatic API on
 those types to the other language. For example when manipulating a C++ string
 from Rust, its `len()` method becomes a call of the `size()` member function
-defined by C++; when manipulation a Rust string from C++, its `size()` member
+defined by C++; when manipulating a Rust string from C++, its `size()` member
 function calls Rust's `len()`.
 
 <br>
 
 ## Example
 
-A runnable version of this example is provided under the *demo-rs* directory of
-this repo (with the C++ side of the implementation in the *demo-cxx* directory).
-To try it out, jump into demo-rs and run `cargo run`.
+A runnable version of this example is provided under the *demo* directory of
+this repo. To try it out, run `cargo run` from that directory.
 
 ```rust
 #[cxx::bridge]
@@ -77,7 +80,7 @@ mod ffi {
         // One or more headers with the matching C++ declarations. Our code
         // generators don't read it but it gets #include'd and used in static
         // assertions to ensure our picture of the FFI boundary is accurate.
-        include!("demo-cxx/demo.h");
+        include!("demo/include/demo.h");
 
         // Zero or more opaque types which both languages can pass around but
         // only C++ can see the fields.
@@ -106,10 +109,10 @@ get to call back and forth safely.
 
 Here are links to the complete set of source files involved in the demo:
 
-- [demo-rs/src/main.rs](demo-rs/src/main.rs)
-- [demo-rs/build.rs](demo-rs/build.rs)
-- [demo-cxx/demo.h](demo-cxx/demo.h)
-- [demo-cxx/demo.cc](demo-cxx/demo.cc)
+- [demo/src/main.rs](demo/src/main.rs)
+- [demo/build.rs](demo/build.rs)
+- [demo/include/demo.h](demo/include/demo.h)
+- [demo/src/demo.cc](demo/src/demo.cc)
 
 To look at the code generated in both languages for the example by the CXX code
 generators:
@@ -117,10 +120,10 @@ generators:
 ```console
    # run Rust code generator and print to stdout
    # (requires https://github.com/dtolnay/cargo-expand)
-$ cargo expand --manifest-path demo-rs/Cargo.toml
+$ cargo expand --manifest-path demo/Cargo.toml
 
    # run C++ code generator and print to stdout
-$ cargo run --manifest-path cmd/Cargo.toml -- demo-rs/src/main.rs
+$ cargo run --manifest-path gen/cmd/Cargo.toml -- demo/src/main.rs
 ```
 
 <br>
@@ -215,19 +218,25 @@ set up any additional source files and compiler flags as normal.
 
 [`cc::Build`]: https://docs.rs/cc/1.0/cc/struct.Build.html
 
+```toml
+# Cargo.toml
+
+[build-dependencies]
+cxx-build = "0.4"
+```
+
 ```rust
 // build.rs
 
 fn main() {
-    cxx::Build::new()
-        .bridge("src/main.rs")  // returns a cc::Build
-        .file("../demo-cxx/demo.cc")
-        .flag("-std=c++11")
+    cxx_build::bridge("src/main.rs")  // returns a cc::Build
+        .file("src/demo.cc")
+        .flag_if_supported("-std=c++11")
         .compile("cxxbridge-demo");
 
     println!("cargo:rerun-if-changed=src/main.rs");
-    println!("cargo:rerun-if-changed=../demo-cxx/demo.h");
-    println!("cargo:rerun-if-changed=../demo-cxx/demo.cc");
+    println!("cargo:rerun-if-changed=src/demo.cc");
+    println!("cargo:rerun-if-changed=include/demo.h");
 }
 ```
 
@@ -292,23 +301,27 @@ Some of the considerations that go into ensuring safety are:
 
 ## Builtin types
 
-In addition to all the primitive types (i32 ⟷ int32_t), the following common
-types may be used in the fields of shared structs and the arguments and returns
-of functions.
+In addition to all the primitive types (i32 &lt;=&gt; int32_t), the following
+common types may be used in the fields of shared structs and the arguments and
+returns of functions.
 
 <table>
 <tr><th>name in Rust</th><th>name in C++</th><th>restrictions</th></tr>
-<tr><td>String</td><td>cxxbridge::RustString</td><td></td></tr>
-<tr><td>&amp;str</td><td>cxxbridge::RustStr</td><td></td></tr>
-<tr><td><a href="https://docs.rs/cxx/0.1/cxx/struct.CxxString.html">CxxString</a></td><td>std::string</td><td><sup><i>cannot be passed by value</i></sup></td></tr>
-<tr><td>Box&lt;T&gt;</td><td>cxxbridge::RustBox&lt;T&gt;</td><td><sup><i>cannot hold opaque C++ type</i></sup></td></tr>
-<tr><td><a href="https://docs.rs/cxx/0.1/cxx/struct.UniquePtr.html">UniquePtr&lt;T&gt;</a></td><td>std::unique_ptr&lt;T&gt;</td><td><sup><i>cannot hold opaque Rust type</i></sup></td></tr>
-<tr><td></td><td></td><td></td></tr>
+<tr><td>String</td><td>rust::String</td><td></td></tr>
+<tr><td>&amp;str</td><td>rust::Str</td><td></td></tr>
+<tr><td>&amp;[u8]</td><td>rust::Slice&lt;uint8_t&gt;</td><td><sup><i>arbitrary &amp;[T] not implemented yet</i></sup></td></tr>
+<tr><td><a href="https://docs.rs/cxx/0.4/cxx/struct.CxxString.html">CxxString</a></td><td>std::string</td><td><sup><i>cannot be passed by value</i></sup></td></tr>
+<tr><td>Box&lt;T&gt;</td><td>rust::Box&lt;T&gt;</td><td><sup><i>cannot hold opaque C++ type</i></sup></td></tr>
+<tr><td><a href="https://docs.rs/cxx/0.4/cxx/struct.UniquePtr.html">UniquePtr&lt;T&gt;</a></td><td>std::unique_ptr&lt;T&gt;</td><td><sup><i>cannot hold opaque Rust type</i></sup></td></tr>
+<tr><td>Vec&lt;T&gt;</td><td>rust::Vec&lt;T&gt;</td><td><sup><i>cannot hold opaque C++ type</i></sup></td></tr>
+<tr><td><a href="https://docs.rs/cxx/0.4/cxx/struct.CxxVector.html">CxxVector&lt;T&gt;</a></td><td>std::vector&lt;T&gt;</td><td><sup><i>cannot be passed by value, cannot hold opaque Rust type</i></sup></td></tr>
+<tr><td>fn(T, U) -&gt; V</td><td>rust::Fn&lt;V(T, U)&gt;</td><td><sup><i>only passing from Rust to C++ is implemented so far</i></sup></td></tr>
+<tr><td>Result&lt;T&gt;</td><td>throw/catch</td><td><sup><i>allowed as return type only</i></sup></td></tr>
 </table>
 
-The C++ API of the `cxxbridge` namespace is defined by the *include/cxxbridge.h*
-file in this repo. You will need to include this header in your C++ code when
-working with those types.
+The C++ API of the `rust` namespace is defined by the *include/cxx.h* file in
+this repo. You will need to include this header in your C++ code when working
+with those types.
 
 The following types are intended to be supported "soon" but are just not
 implemented yet. I don't expect any of these to be hard to make work but it's a
@@ -316,13 +329,13 @@ matter of designing a nice API for each in its non-native language.
 
 <table>
 <tr><th>name in Rust</th><th>name in C++</th></tr>
-<tr><td>&amp;[T]</td><td><sup><i>tbd</i></sup></td></tr>
-<tr><td>Vec&lt;T&gt;</td><td><sup><i>tbd</i></sup></td></tr>
 <tr><td>BTreeMap&lt;K, V&gt;</td><td><sup><i>tbd</i></sup></td></tr>
 <tr><td>HashMap&lt;K, V&gt;</td><td><sup><i>tbd</i></sup></td></tr>
-<tr><td><sup><i>tbd</i></sup></td><td>std::vector&lt;T&gt;</td></tr>
+<tr><td>Arc&lt;T&gt;</td><td><sup><i>tbd</i></sup></td></tr>
+<tr><td>Option&lt;T&gt;</td><td><sup><i>tbd</i></sup></td></tr>
 <tr><td><sup><i>tbd</i></sup></td><td>std::map&lt;K, V&gt;</td></tr>
 <tr><td><sup><i>tbd</i></sup></td><td>std::unordered_map&lt;K, V&gt;</td></tr>
+<tr><td><sup><i>tbd</i></sup></td><td>std::shared_ptr&lt;T&gt;</td></tr>
 </table>
 
 <br>
@@ -330,20 +343,12 @@ matter of designing a nice API for each in its non-native language.
 ## Remaining work
 
 This is still early days for CXX; I am releasing it as a minimum viable product
-to collect feedback on the direction and invite collaborators. Here are some of
-the facets that I still intend for this project to tackle:
+to collect feedback on the direction and invite collaborators. Please check the
+open issues.
 
-- [ ] Support associated methods: `extern "Rust" { fn f(self: &Struct); }`
-- [ ] Support C++ member functions
-- [ ] Support passing function pointers across the FFI
-- [ ] Support translating between Result ⟷ exceptions
-- [ ] Support structs with type parameters
-- [ ] Support async functions
-
-On the build side, I don't have much experience with the `cc` crate so I expect
-there may be someone who can suggest ways to make that aspect of this crate
-friendlier or more robust. Please report issues if you run into trouble building
-or linking any of this stuff.
+Especially please report issues if you run into trouble building or linking any
+of this stuff. I'm sure there are ways to make the build aspects friendlier or
+more robust.
 
 Finally, I know more about Rust library design than C++ library design so I
 would appreciate help making the C++ APIs in this project more idiomatic where

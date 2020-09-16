@@ -1,12 +1,13 @@
-use std::borrow::Cow;
-use std::fmt::{self, Debug, Display};
-use std::slice;
-use std::str::{self, Utf8Error};
+use alloc::borrow::Cow;
+use alloc::string::String;
+use core::fmt::{self, Debug, Display};
+use core::slice;
+use core::str::{self, Utf8Error};
 
 extern "C" {
-    #[link_name = "cxxbridge01$cxx_string$data"]
+    #[link_name = "cxxbridge04$cxx_string$data"]
     fn string_data(_: &CxxString) -> *const u8;
-    #[link_name = "cxxbridge01$cxx_string$length"]
+    #[link_name = "cxxbridge04$cxx_string$length"]
     fn string_length(_: &CxxString) -> usize;
 }
 
@@ -36,6 +37,10 @@ impl CxxString {
     }
 
     /// Returns true if `self` has a length of zero bytes.
+    ///
+    /// Matches the behavior of C++ [std::string::empty][empty].
+    ///
+    /// [empty]: https://en.cppreference.com/w/cpp/string/basic_string/empty
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
@@ -54,9 +59,10 @@ impl CxxString {
     /// Note that the return type may look like `const char *` but is not a
     /// `const char *` in the typical C sense, as C++ strings may contain
     /// internal null bytes. As such, the returned pointer only makes sense as a
-    /// string in combination with the length returned by [`len()`](#len).
+    /// string in combination with the length returned by [`len()`][len].
     ///
     /// [data]: https://en.cppreference.com/w/cpp/string/basic_string/data
+    /// [len]: #method.len
     pub fn as_ptr(&self) -> *const u8 {
         unsafe { string_data(self) }
     }
@@ -80,12 +86,30 @@ impl CxxString {
 
 impl Display for CxxString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        Display::fmt(&String::from_utf8_lossy(self.as_bytes()), f)
+        Display::fmt(self.to_string_lossy().as_ref(), f)
     }
 }
 
 impl Debug for CxxString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        Debug::fmt(&String::from_utf8_lossy(self.as_bytes()), f)
+        Debug::fmt(self.to_string_lossy().as_ref(), f)
+    }
+}
+
+impl PartialEq for CxxString {
+    fn eq(&self, other: &CxxString) -> bool {
+        self.as_bytes() == other.as_bytes()
+    }
+}
+
+impl PartialEq<CxxString> for str {
+    fn eq(&self, other: &CxxString) -> bool {
+        self.as_bytes() == other.as_bytes()
+    }
+}
+
+impl PartialEq<str> for CxxString {
+    fn eq(&self, other: &str) -> bool {
+        self.as_bytes() == other.as_bytes()
     }
 }

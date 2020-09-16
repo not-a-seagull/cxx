@@ -1,30 +1,28 @@
-use std::slice;
-use std::str;
+use core::mem;
+use core::ptr::NonNull;
+use core::slice;
+use core::str;
 
 // Not necessarily ABI compatible with &str. Codegen performs the translation.
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct RustStr {
-    ptr: *const u8,
-    len: usize,
+    pub(crate) ptr: NonNull<u8>,
+    pub(crate) len: usize,
 }
 
 impl RustStr {
     pub fn from(s: &str) -> Self {
         RustStr {
-            ptr: s.as_ptr(),
+            ptr: NonNull::from(s).cast::<u8>(),
             len: s.len(),
         }
     }
 
     pub unsafe fn as_str<'a>(self) -> &'a str {
-        let slice = slice::from_raw_parts(self.ptr, self.len);
+        let slice = slice::from_raw_parts(self.ptr.as_ptr(), self.len);
         str::from_utf8_unchecked(slice)
     }
 }
 
-#[export_name = "cxxbridge01$rust_str$valid"]
-unsafe extern "C" fn str_valid(ptr: *const u8, len: usize) -> bool {
-    let slice = slice::from_raw_parts(ptr, len);
-    str::from_utf8(slice).is_ok()
-}
+const_assert_eq!(mem::size_of::<Option<RustStr>>(), mem::size_of::<RustStr>());

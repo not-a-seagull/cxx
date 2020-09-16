@@ -1,36 +1,49 @@
+use crate::syntax::check::Check;
+use crate::syntax::namespace::Namespace;
 use crate::syntax::{error, Api};
 use proc_macro2::Ident;
-use syn::{Error, Result};
 
-pub(crate) fn check(ident: &Ident) -> Result<()> {
+fn check(cx: &mut Check, ident: &Ident) {
     let s = ident.to_string();
+    if s.starts_with("cxxbridge") {
+        cx.error(ident, error::CXXBRIDGE_RESERVED.msg);
+    }
     if s.contains("__") {
-        Err(Error::new(ident.span(), error::DOUBLE_UNDERSCORE.msg))
-    } else if s.starts_with("cxxbridge") {
-        Err(Error::new(ident.span(), error::CXXBRIDGE_RESERVED.msg))
-    } else {
-        Ok(())
+        cx.error(ident, error::DOUBLE_UNDERSCORE.msg);
     }
 }
 
-pub(crate) fn check_all(apis: &[Api], errors: &mut Vec<Error>) {
+pub(crate) fn check_all(cx: &mut Check, namespace: &Namespace, apis: &[Api]) {
+    for segment in namespace {
+        check(cx, segment);
+    }
+
     for api in apis {
         match api {
             Api::Include(_) => {}
             Api::Struct(strct) => {
-                errors.extend(check(&strct.ident).err());
+                check(cx, &strct.ident);
                 for field in &strct.fields {
-                    errors.extend(check(&field.ident).err());
+                    check(cx, &field.ident);
+                }
+            }
+            Api::Enum(enm) => {
+                check(cx, &enm.ident);
+                for variant in &enm.variants {
+                    check(cx, &variant.ident);
                 }
             }
             Api::CxxType(ety) | Api::RustType(ety) => {
-                errors.extend(check(&ety.ident).err());
+                check(cx, &ety.ident);
             }
             Api::CxxFunction(efn) | Api::RustFunction(efn) => {
-                errors.extend(check(&efn.ident).err());
+                check(cx, &efn.ident);
                 for arg in &efn.args {
-                    errors.extend(check(&arg.ident).err());
+                    check(cx, &arg.ident);
                 }
+            }
+            Api::TypeAlias(alias) => {
+                check(cx, &alias.ident);
             }
         }
     }

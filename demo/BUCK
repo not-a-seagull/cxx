@@ -1,0 +1,57 @@
+rust_binary(
+    name = "demo",
+    srcs = glob(["src/**/*.rs"]),
+    deps = [
+        ":demo-sys",
+        ":gen",
+        "//:cxx",
+    ],
+)
+
+cxx_library(
+    name = "gen",
+    srcs = [":gen-source"],
+    deps = [
+        ":demo-include",
+        ":include",
+    ],
+)
+
+genrule(
+    name = "gen-header",
+    srcs = ["src/main.rs"],
+    out = "generated.h",
+    cmd = "$(exe //:codegen) --header ${SRCS} > ${OUT}",
+    type = "cxxbridge",
+)
+
+genrule(
+    name = "gen-source",
+    srcs = ["src/main.rs"],
+    out = "generated.cc",
+    cmd = "$(exe //:codegen) ${SRCS} > ${OUT}",
+    type = "cxxbridge",
+)
+
+cxx_library(
+    name = "include",
+    exported_headers = {
+        "src/main.rs.h": ":gen-header",
+    },
+)
+
+cxx_library(
+    name = "demo-sys",
+    srcs = ["src/demo.cc"],
+    compiler_flags = ["-std=c++14"],
+    deps = [
+        ":demo-include",
+        ":include",
+    ],
+)
+
+cxx_library(
+    name = "demo-include",
+    exported_headers = ["include/demo.h"],
+    deps = ["//:core"],
+)
